@@ -131,7 +131,6 @@ public class testrfclass{
             lateral =  gamepad.left_stick_x;
              target= Math.toDegrees(Math.atan2(lateral,axial));
             if(axial == 0&&lateral==0)target=0;
-            power=Math.sqrt((axial*axial)+(lateral*lateral));
             power=Range.clip(power,-1,1);
 //            if (((target>=0&&target<=45)||(target<0&&target>=-45))&&gamepad.right_stick_x>0){
 //                power= Range.clip(power*-gamepad.right_stick_x,0, 1);
@@ -142,15 +141,18 @@ public class testrfclass{
 //            }else if ((target>-135&&target<=-45)&&gamepad.right_stick_x>0){
 //                power= Range.clip(power*-gamepad.right_stick_x,0, 1);
 //            }
+            power=Math.sqrt((axial*axial)+(lateral*lateral));
             if (((target>=0&&target<=45)||(target<0&&target>=-45))&&gamepad.right_stick_x>0){
-            power= Range.clip(power/gamepad.right_stick_x,0, 1);
+                power= Range.clip(power/Range.scale(gamepad.right_stick_x,-1,1,-10,10),0,1);
             } else if ((target>45&&target<=135)&&gamepad.right_stick_x<0){
-            power= Range.clip(power/-gamepad.right_stick_x,0, 1);
+            power= Range.clip(power/-Range.scale(gamepad.right_stick_x,-1,1,-10,10),0,1);
             }else if (((target>=135&&target<=180)||(target<-135&&target>=-180))&&gamepad.right_stick_x<0) {
-            power= Range.clip(power/-gamepad.right_stick_x,0, 1);
+            power= Range.clip(power/-Range.scale(gamepad.right_stick_x,-1,1,-10,10),0,1);
             }else if ((target>-135&&target<=-45)&&gamepad.right_stick_x>0){
-            power= Range.clip(power/gamepad.right_stick_x,0, 1);
+            power= Range.clip(power/Range.scale(gamepad.right_stick_x,-1,1,-10,10),0,1);
             }
+
+
 
             if(axial==0 && lateral==0 &&gamepad.right_stick_x<0){
                 if(Math.abs(135-currentangle)<=180){

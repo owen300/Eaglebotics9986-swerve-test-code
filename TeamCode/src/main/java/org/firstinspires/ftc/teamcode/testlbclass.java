@@ -130,13 +130,13 @@ public class testlbclass {
             power=Math.sqrt((axial*axial)+(lateral*lateral));
             power=Range.clip(power,-1,1);
             if (((target>=0&&target<=45)||(target<0&&target>=-45))&&gamepad.right_stick_x<0){
-                power= Range.clip(power/-gamepad.right_stick_x,0, 1);
+                power= Range.clip(power/-Range.scale(gamepad.right_stick_x,-1,1,-10,10),0,1);
             } else if ((target>45&&target<=135)&&gamepad.right_stick_x>0){
-                power= Range.clip(power/gamepad.right_stick_x,0, 1);
+                power= Range.clip(power/Range.scale(gamepad.right_stick_x,-1,1,-10,10),0,1);
             }else if (((target>=135&&target<=180)||(target<-135&&target>=-180))&&gamepad.right_stick_x>0) {
-                power= Range.clip(power/gamepad.right_stick_x,0, 1);
+                power= Range.clip(power/Range.scale(gamepad.right_stick_x,-1,1,-10,10),0,1);
             }else if ((target>-135&&target<=-45)&&gamepad.right_stick_x<0){
-                power= Range.clip(power/-gamepad.right_stick_x,0, 1);
+                power= Range.clip(power/-Range.scale(gamepad.right_stick_x,-1,1,-10,10),0,1);
             }
 
             if(axial==0 && lateral==0 &&gamepad.right_stick_x<0){

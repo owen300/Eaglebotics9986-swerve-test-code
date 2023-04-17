@@ -113,19 +113,70 @@ public class swerve_point_right_front extends LinearOpMode {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-            runtime.reset();
-            rotationController.setPIDF(P, I, D, 0);
+//            runtime.reset();
+//            rotationController.setPIDF(P, I, D, 0);
+            double error=0;
+            double power=0;
             double max;
-            double currentpos = 0;//encoder.getCurrentPosition();
+            double currentpos = 0.1;//encoder.getCurrentPosition();
             double currentangle=normalizeDegrees((currentpos/3.3)*360);
             double axial   = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
             double lateral =  gamepad1.left_stick_x;
-            double target= Math.toDegrees(Math.atan2(lateral,axial));
+            double target=Math.toDegrees(Math.atan2(lateral,axial));
+            double power1=0;
+
+//            if(axial == 0&&lateral==0)target=0;
+//            double power=Math.sqrt((axial*axial)+(lateral*lateral));
+//            power=((power/1.189)*1);
+//            if (((target>=0&&target<=45)||(target<0&&target>=-45))&&gamepad1.right_stick_x>0){
+//                power= Range.clip(power*-gamepad1.right_stick_x,0, 1);
+//            } else if ((target>45&&target<=135)&&gamepad1.right_stick_x<0){
+//                power= Range.clip(power*gamepad1.right_stick_x,0, 1);
+//            }else if (((target>=135&&target<=180)||(target<-135&&target>=-180))&&gamepad1.right_stick_x<0) {
+//                power= Range.clip(power*gamepad1.right_stick_x,0, 1);
+//            }else if ((target>-135&&target<=-45)&&gamepad1.right_stick_x>0){
+//                power= Range.clip(power*-gamepad1.right_stick_x,0, 1);
+//            }
+//
+//            if(axial==0 && lateral==0 &&gamepad1.right_stick_x<0){
+//                if(Math.abs(135-currentangle)<=180){
+//                    target= 135;
+//                    power=gamepad1.right_stick_x;
+//                } else if(Math.abs(135-currentangle)>180){
+//                    target= -45;
+//                    power=(-gamepad1.right_stick_x);
+//                }
+//            }else if(axial==0 && lateral==0&&gamepad1.right_stick_x>0){
+//                if(Math.abs(135-currentangle)<=180){
+//                    target= 135;
+//                    power=gamepad1.right_stick_x;
+//                } else if(Math.abs(135-currentangle)>180){
+//                    target= -45;
+//                    power=(-gamepad1.right_stick_x);
+//                }
+//            }
+//
+//            // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
+//            double error = normalizeDegrees(target - currentangle);
+//            if (Double.isNaN(error)) error = 0;
+//
+//            double power1 = Range.clip(rotationController.calculate(0, error), -MAX_SERVO, MAX_SERVO);
+//            if (Double.isNaN(power1)) power1 = 0;
+//            //servo.setPower(power1 + (Math.abs(error) > 0.02 ? K_STATIC : 0) * Math.signum(power1));
+//            double axonpower=power1 + (Math.abs(error) > 0.02 ? K_STATIC : 0) * Math.signum(power1);
+
+            runtime.reset();
+            rotationController.setPIDF(P, I, D, 0);
+
+            currentpos = 0;//encoder.getCurrentPosition();
+            currentangle=normalizeDegrees((currentpos/5)*360);
+            axial   = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
+            lateral =  gamepad1.left_stick_x;
+            target= Math.toDegrees(Math.atan2(lateral,axial));
             if(axial == 0&&lateral==0)target=0;
-            double power=Math.sqrt((axial*axial)+(lateral*lateral));
-            power=((power/1.189)*1);
+            power=Math.sqrt((axial*axial)+(lateral*lateral));
             if (((target>=0&&target<=45)||(target<0&&target>=-45))&&gamepad1.right_stick_x>0){
-                power= Range.clip(power*-gamepad1.right_stick_x,0, 1);
+                power= Range.clip(power/Range.scale(gamepad1.right_stick_x,-1,1,-10,10),0, 1);
             } else if ((target>45&&target<=135)&&gamepad1.right_stick_x<0){
                 power= Range.clip(power*gamepad1.right_stick_x,0, 1);
             }else if (((target>=135&&target<=180)||(target<-135&&target>=-180))&&gamepad1.right_stick_x<0) {
@@ -133,6 +184,18 @@ public class swerve_point_right_front extends LinearOpMode {
             }else if ((target>-135&&target<=-45)&&gamepad1.right_stick_x>0){
                 power= Range.clip(power*-gamepad1.right_stick_x,0, 1);
             }
+//            power=Math.sqrt((axial*axial)+(lateral*lateral));
+//            if (((target>=0&&target<=45)||(target<0&&target>=-45))&&gamepad1.right_stick_x>0){
+//                power= power/gamepad1.right_stick_x;
+//            } else if ((target>45&&target<=135)&&gamepad1.right_stick_x<0){
+//                power= power/-gamepad1.right_stick_x;
+//            }else if (((target>=135&&target<=180)||(target<-135&&target>=-180))&&gamepad1.right_stick_x<0) {
+//                power= power/-gamepad1.right_stick_x;
+//            }else if ((target>-135&&target<=-45)&&gamepad1.right_stick_x>0){
+//                power= power/gamepad1.right_stick_x;
+//            }
+            power=Range.clip(power,-1,1);
+
 
             if(axial==0 && lateral==0 &&gamepad1.right_stick_x<0){
                 if(Math.abs(135-currentangle)<=180){
@@ -153,10 +216,10 @@ public class swerve_point_right_front extends LinearOpMode {
             }
 
             // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
-            double error = normalizeDegrees(target - currentangle);
+            error = normalizeDegrees(target - currentangle);
             if (Double.isNaN(error)) error = 0;
 
-            double power1 = Range.clip(rotationController.calculate(0, error), -MAX_SERVO, MAX_SERVO);
+            power1 = Range.clip(rotationController.calculate(0, error), -MAX_SERVO, MAX_SERVO);
             if (Double.isNaN(power1)) power1 = 0;
             //servo.setPower(power1 + (Math.abs(error) > 0.02 ? K_STATIC : 0) * Math.signum(power1));
             double axonpower=power1 + (Math.abs(error) > 0.02 ? K_STATIC : 0) * Math.signum(power1);
