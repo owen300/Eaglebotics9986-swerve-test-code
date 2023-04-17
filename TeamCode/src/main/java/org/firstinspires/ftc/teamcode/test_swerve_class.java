@@ -87,11 +87,15 @@ public class test_swerve_class extends LinearOpMode {
     public void runOpMode() {
        testrfclass fR= new testrfclass(gamepad1,hardwareMap);
        testrbclass bR= new testrbclass(gamepad1,hardwareMap);
+       testlfclass fL= new testlfclass(gamepad1,hardwareMap);
+       testlbclass bL= new testlbclass(gamepad1,hardwareMap);
             waitForStart();
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             fR.run(gamepad1);
             bR.run(gamepad1);
+            fL.run(gamepad1);
+            bL.run(gamepad1);
             double frcurrentangle= fR.currentangle;
             double fraxial   = fR.axial;  // Note: pushing stick forward gives negative value
             double frlateral = fR.lateral;
@@ -118,6 +122,34 @@ public class test_swerve_class extends LinearOpMode {
 
             //servo.setPower(power1 + (Math.abs(error) > 0.02 ? K_STATIC : 0) * Math.signum(power1));
             double braxonpower=bR.axonpower;
+
+            double blcurrentangle= bL.currentangle;
+            double blaxial   = bL.axial;  // Note: pushing stick forward gives negative value
+            double bllateral = bL.lateral;
+            double bltarget= bL.target;
+
+            // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
+            double blerror = bL.error;
+
+            double blpower= bL.power;
+            double blpower1 = bL.power1;
+
+            //servo.setPower(power1 + (Math.abs(error) > 0.02 ? K_STATIC : 0) * Math.signum(power1));
+            double blaxonpower=bL.axonpower;
+
+            double flcurrentangle= fL.currentangle;
+            double flaxial   = fL.axial;  // Note: pushing stick forward gives negative value
+            double fllateral = fL.lateral;
+            double fltarget= fL.target;
+
+            // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
+            double flerror = fL.error;
+
+            double flpower= fL.power;
+            double flpower1 = fL.power1;
+
+            //servo.setPower(power1 + (Math.abs(error) > 0.02 ? K_STATIC : 0) * Math.signum(power1));
+            double flaxonpower=fL.axonpower;
 
 //            if((gamepad1.right_stick_x<=0||gamepad1.right_stick_x>=0)&&(power==0)){
 //                if (gamepad1.right_stick_x<0){
@@ -177,6 +209,22 @@ public class test_swerve_class extends LinearOpMode {
             telemetry.addData("error", brerror);
             telemetry.addData("mpower", brpower);
             telemetry.addData("cangle", brcurrentangle);
+            telemetry.addLine();
+            telemetry.addData("power", blaxonpower);
+            telemetry.addData("angle", bltarget);
+            telemetry.addData("axial", blaxial);
+            telemetry.addData("l", bllateral);
+            telemetry.addData("error", blerror);
+            telemetry.addData("mpower", blpower);
+            telemetry.addData("cangle", blcurrentangle);
+            telemetry.addLine();
+            telemetry.addData("power", flaxonpower);
+            telemetry.addData("angle", fltarget);
+            telemetry.addData("axial", flaxial);
+            telemetry.addData("l", fllateral);
+            telemetry.addData("error", flerror);
+            telemetry.addData("mpower", flpower);
+            telemetry.addData("cangle", flcurrentangle);
             telemetry.update();
             //runtime.reset();
         }
