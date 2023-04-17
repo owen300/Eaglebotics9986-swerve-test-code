@@ -69,7 +69,7 @@ import com.qualcomm.robotcore.util.Range;
 
 
 
-public class testlfclass {
+public class testlbclass {
     public static double P = 0.45, I = 0.01, D = 0.1;
     public static double K_STATIC = 0.04;
     private PIDFController rotationController;
@@ -91,7 +91,7 @@ public class testlfclass {
     public double power1 = 0;
     public double power;
     public double i=0;
-    public testlfclass(Gamepad gamepad1, HardwareMap hardwareMap) {
+    public testlbclass(Gamepad gamepad1, HardwareMap hardwareMap) {
         rotationController = new PIDFController(P, I, D, 0);
 
         rotationController.setTolerance(1);
@@ -131,28 +131,28 @@ public class testlfclass {
             power=((power/1.189)*1);
             if (((target>=0&&target<=45)||(target<0&&target>=-45))&&gamepad.right_stick_x<0){
                 power= Range.clip(power/-gamepad.right_stick_x,0, 1);
-            } else if ((target>45&&target<=135)&&gamepad.right_stick_x<0){
-                power= Range.clip(power/-gamepad.right_stick_x,0, 1);
+            } else if ((target>45&&target<=135)&&gamepad.right_stick_x>0){
+                power= Range.clip(power/gamepad.right_stick_x,0, 1);
             }else if (((target>=135&&target<=180)||(target<-135&&target>=-180))&&gamepad.right_stick_x>0) {
                 power= Range.clip(power/gamepad.right_stick_x,0, 1);
-            }else if ((target>-135&&target<=-45)&&gamepad.right_stick_x>0){
-                power= Range.clip(power/gamepad.right_stick_x,0, 1);
+            }else if ((target>-135&&target<=-45)&&gamepad.right_stick_x<0){
+                power= Range.clip(power/-gamepad.right_stick_x,0, 1);
             }
 
             if(axial==0 && lateral==0 &&gamepad.right_stick_x<0){
-                if(Math.abs(45-currentangle)<=180){
-                    target= 45;
+                if(Math.abs(135-currentangle)<=180){
+                    target= 135;
                     power=gamepad.right_stick_x;
-                } else if(Math.abs(45-currentangle)>180){
-                    target= -135;
+                } else if(Math.abs(135-currentangle)>180){
+                    target= -45;
                     power=(-gamepad.right_stick_x);
                 }
             }else if(axial==0 && lateral==0&&gamepad.right_stick_x>0){
-                if(Math.abs(45-currentangle)<=180){
-                    target= 45;
+                if(Math.abs(135-currentangle)<=180){
+                    target= 135;
                     power=gamepad.right_stick_x;
-                } else if(Math.abs(45-currentangle)>180){
-                    target= -135;
+                } else if(Math.abs(135-currentangle)>180){
+                    target= -45;
                     power=(-gamepad.right_stick_x);
                 }
             }
