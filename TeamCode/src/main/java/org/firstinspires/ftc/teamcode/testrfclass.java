@@ -132,7 +132,7 @@ public class testrfclass{
              target= Math.toDegrees(Math.atan2(lateral,axial));
             if(axial == 0&&lateral==0)target=0;
             power=Math.sqrt((axial*axial)+(lateral*lateral));
-            power=((power/1.189)*1);
+            power=Range.clip(power,-1,1);
 //            if (((target>=0&&target<=45)||(target<0&&target>=-45))&&gamepad.right_stick_x>0){
 //                power= Range.clip(power*-gamepad.right_stick_x,0, 1);
 //            } else if ((target>45&&target<=135)&&gamepad.right_stick_x<0){
