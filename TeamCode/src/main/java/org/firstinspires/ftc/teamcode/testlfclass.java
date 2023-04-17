@@ -140,11 +140,11 @@ public class testlfclass {
             }
 
             if(axial==0 && lateral==0 &&gamepad.right_stick_x<0){
-                if(Math.abs(135-currentangle)<=180){
-                    target= 135;
+                if(Math.abs(45-currentangle)<=180){
+                    target= 45;
                     power=gamepad.right_stick_x;
-                } else if(Math.abs(135-currentangle)>180){
-                    target= -45;
+                } else if(Math.abs(45-currentangle)>180){
+                    target= -135;
                     power=(-gamepad.right_stick_x);
                 }
             }else if(axial==0 && lateral==0&&gamepad.right_stick_x>0){
