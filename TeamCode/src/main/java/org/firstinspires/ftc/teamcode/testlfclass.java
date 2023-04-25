@@ -157,13 +157,13 @@ public class testlfclass {
                 }
             }
 
-            // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
+
             error = normalizeDegrees(target - currentangle);
             if (Double.isNaN(error)) error = 0;
 
             power1 = Range.clip(rotationController.calculate(0, error), -MAX_SERVO, MAX_SERVO);
             if (Double.isNaN(power1)) power1 = 0;
-            //servo.setPower(power1 + (Math.abs(error) > 0.02 ? K_STATIC : 0) * Math.signum(power1));
+
             axonpower=power1 + (Math.abs(error) > 0.02 ? K_STATIC : 0) * Math.signum(power1);
 //            if((gamepad1.right_stick_x<=0||gamepad1.right_stick_x>=0)&&(power==0)){
 //                if (gamepad1.right_stick_x<0){
