@@ -40,6 +40,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
+import com.outoftheboxrobotics.photoncore.PhotonCore;
 
 /**
  * This file contains an example of a Linear "OpMode".
@@ -89,7 +90,8 @@ public class test_swerve_class extends LinearOpMode {
        testrbclass bR= new testrbclass(gamepad1,hardwareMap);
        testlfclass fL= new testlfclass(gamepad1,hardwareMap);
        testlbclass bL= new testlbclass(gamepad1,hardwareMap);
-            waitForStart();
+       PhotonCore.enable();
+       waitForStart();
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             fR.run(gamepad1);
