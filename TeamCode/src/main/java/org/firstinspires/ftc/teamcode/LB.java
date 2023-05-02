@@ -134,10 +134,10 @@ public class LB {
             if (Double.isNaN(power1)) power1 = 0;
             //servo.setPower(power1 + (Math.abs(error) > 0.02 ? K_STATIC : 0) * Math.signum(power1));
             axonpower=power1 + (Math.abs(error) > 0.02 ? K_STATIC : 0) * Math.signum(power1);
-            runp(axonpower,p);
+            runP(axonpower,p);
     }
         // run until the end of the match (driver presses STOP)
-        public void runp(double p,double mp) {
+        public void runP(double p,double mp) {
            m.setPower(mp);
            s.setPower(p);
         }

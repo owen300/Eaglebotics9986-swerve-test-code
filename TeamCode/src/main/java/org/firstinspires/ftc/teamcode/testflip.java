@@ -29,16 +29,13 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeDegrees;
-
 import com.arcrobotics.ftclib.controller.PIDFController;
 import com.outoftheboxrobotics.photoncore.PhotonCore;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Gamepad;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 
 /**
  * This file contains an example of a Linear "OpMode".
@@ -68,9 +65,9 @@ import com.qualcomm.robotcore.util.Range;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
+@TeleOp(name="swerve test idk", group="00")
 
-
-public class lbmotorflip {
+public class testflip extends LinearOpMode {
     public static double P = 0.45, I = 0.01, D = 0.1;
     public static double K_STATIC = 0.04;
     private PIDFController rotationController;
@@ -81,107 +78,41 @@ public class lbmotorflip {
     private DcMotor rightFrontDrive = null;
     private DcMotor encoder = null;
    private CRServo servo;
-   public double axonpower=0;
-    double currentpos = 0;//encoder.getCurrentPosition();
-    double currentangle=0;
-    double axial   = 0;  // Note: pushing stick forward gives negative value
-    double lateral =  0;
-    double target= 0;
     public static double MAX_SERVO = 1, MAX_MOTOR = 1;
-    public double error;
-    public double power1 = 0;
-    public double power;
-    public double i=0;
-    public lbmotorflip(Gamepad gamepad1, HardwareMap hardwareMap) {
-        PhotonCore.enable();
-        rotationController = new PIDFController(P, 0,D, 0.01);
-
-        rotationController.setTolerance(1);
-        // Initialize the hardware variables. Note that the strings used here must correspond
-        // to the names assigned during the robot configuration step on the DS or RC devices.
-//        encoder=hardwareMap.dcMotor.get("enc");
-//        servo=hardwareMap.crservo.get("test");
-        // ########################################################################################
-        // !!!            IMPORTANT Drive Information. Test your motor directions.            !!!!!
-        // ########################################################################################
-        // Most robots need the motors on one side to be reversed to drive forward.
-        // The motor reversals shown here are for a "direct drive" robot (the wheels turn the same direction as the motor shaft)
-        // If your robot has additional gear reductions or uses a right-angled drive, it's important to ensure
-        // that your motors are turning in the correct direction.  So, start out with the reversals here, BUT
-        // when you first test your robot, push the left joystick forward and observe the direction the wheels turn.
-        // Reverse the direction (flip FORWARD <-> REVERSE ) of any wheel that runs backward
-        // Keep testing until ALL the wheels move the robot forward when you push the left joystick forward.
-
-
-        // Wait for the game to start (driver presses PLAY)
-
-
-        runtime.reset();
-    }
+    @Override
+    public void runOpMode() {
+       lbmotorflip bL= new lbmotorflip(gamepad1,hardwareMap);
+       PhotonCore.enable();
+       waitForStart();
         // run until the end of the match (driver presses STOP)
-        public void run(Gamepad gamepad) {
-            runtime.reset();
-            rotationController.setPIDF(P, 0, D, 0.01);
-            double max;
-            currentpos = 0;//encoder.getCurrentPosition();
-            currentangle=normalizeDegrees((currentpos/5)*360);
-            axial   = -gamepad.left_stick_y;  // Note: pushing stick forward gives negative value
-            lateral =  gamepad.left_stick_x;
-             target= Math.toDegrees(Math.atan2(lateral,axial));
-            if(axial == 0&&lateral==0)target=0;
-            power=Math.sqrt((axial*axial)+(lateral*lateral));
-            power=Range.clip(power,-1,1);
-            if (((target>=0&&target<=45)||(target<0&&target>=-45))&&gamepad.right_stick_x<0){
-                power= Range.clip(power/-Range.scale(gamepad.right_stick_x,-1,1,-10,10),0,1);
-            } else if ((target>45&&target<=135)&&gamepad.right_stick_x>0){
-                power= Range.clip(power/Range.scale(gamepad.right_stick_x,-1,1,-10,10),0,1);
-            }else if (((target>=135&&target<=180)||(target<-135&&target>=-180))&&gamepad.right_stick_x>0) {
-                power= Range.clip(power/Range.scale(gamepad.right_stick_x,-1,1,-10,10),0,1);
-            }else if ((target>-135&&target<=-45)&&gamepad.right_stick_x<0){
-                power= Range.clip(power/-Range.scale(gamepad.right_stick_x,-1,1,-10,10),0,1);
-            }
+        while (opModeIsActive()) {
+            bL.run(gamepad1);
 
-            if(axial==0 && lateral==0 &&gamepad.right_stick_x<0){
-                if(Math.abs(135-currentangle)<=180){
-                    target= 135;
-                    power=gamepad.right_stick_x;
-                } else if(Math.abs(135-currentangle)>180){
-                    target= -45;
-                    power=(-gamepad.right_stick_x);
-                }
-            }else if(axial==0 && lateral==0&&gamepad.right_stick_x>0){
-                if(Math.abs(135-currentangle)<=180){
-                    target= 135;
-                    power=gamepad.right_stick_x;
-                } else if(Math.abs(135-currentangle)>180){
-                    target= -45;
-                    power=(-gamepad.right_stick_x);
-                }
-            }
 
-            if(target==0&&power==0){
-                target=currentangle;
-            }
             // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
-            error = normalizeDegrees(target - currentangle);
-            if (Double.isNaN(error)) error = 0;
 
-            if(Math.abs(error)>135){//motor flipping test
-                if(error>135){
-                    target=target-180;
-                    power=power*-1;
-                } else if(error<-135){
-                    target=target+180;
-                    power=power*-1;
-                }
-                error = normalizeDegrees(target - currentangle);
-                if (Double.isNaN(error)) error = 0;
-            }
 
-            power1 = Range.clip(rotationController.calculate(0, error), -MAX_SERVO, MAX_SERVO);
-            if (Double.isNaN(power1)) power1 = 0;
             //servo.setPower(power1 + (Math.abs(error) > 0.02 ? K_STATIC : 0) * Math.signum(power1));
-            axonpower=power1 + (Math.abs(error) > 0.02 ? K_STATIC : 0) * Math.signum(power1);
+
+
+            // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
+
+
+            double blcurrentangle= bL.currentangle;
+            double blaxial   = bL.axial;  // Note: pushing stick forward gives negative value
+            double bllateral = bL.lateral;
+            double bltarget= bL.target;
+
+            // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
+            double blerror = bL.error;
+
+            double blpower= bL.power;
+            double blpower1 = bL.power1;
+
+            //servo.setPower(power1 + (Math.abs(error) > 0.02 ? K_STATIC : 0) * Math.signum(power1));
+            double blaxonpower=bL.axonpower;
+
+
 //            if((gamepad1.right_stick_x<=0||gamepad1.right_stick_x>=0)&&(power==0)){
 //                if (gamepad1.right_stick_x<0){
 //
@@ -222,8 +153,18 @@ public class lbmotorflip {
             // Send calculated power to wheels
 
             // Show the elapsed game time and wheel power.
+            telemetry.addData("Status", "Run Time: " + runtime.toString());
+            telemetry.addLine();
+            //telemetry.addData("angle",angle);
 
+            telemetry.addData("power", blaxonpower);
+            telemetry.addData("angle", bltarget);
+            telemetry.addData("axial", blaxial);
+            telemetry.addData("l", bllateral);
+            telemetry.addData("error", blerror);
+            telemetry.addData("mpower", blpower);
+            telemetry.addData("cangle", blcurrentangle);
+            telemetry.update();
             //runtime.reset();
         }
-    }
-
+    }}
