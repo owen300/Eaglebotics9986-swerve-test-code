@@ -33,15 +33,12 @@ import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.norm
 
 import com.arcrobotics.ftclib.controller.PIDFController;
 import com.outoftheboxrobotics.photoncore.PhotonCore;
-import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.CRServoImplEx;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
-import com.qualcomm.robotcore.hardware.PwmControl;
 
 /**
  * This file contains an example of a Linear "OpMode".
@@ -73,33 +70,29 @@ import com.qualcomm.robotcore.hardware.PwmControl;
 
 
 
-public class LB {
+public class lbmotorflip {
     public static double P = 0.45, I = 0.01, D = 0.1;
     public static double K_STATIC = 0.04;
     private PIDFController rotationController;
-    public DcMotor m;
-    private AnalogInput a;
-   private CRServoImplEx s;
+    // Declare OpMode members for each of the 4 motors.
+    private ElapsedTime runtime = new ElapsedTime();
+    private DcMotor leftFrontDrive = null;
+    private DcMotor leftBackDrive = null;
+    private DcMotor rightFrontDrive = null;
+    private DcMotor encoder = null;
+   private CRServo servo;
    public double axonpower=0;
     double currentpos = 0;//encoder.getCurrentPosition();
+    double currentangle=0;
+    double axial   = 0;  // Note: pushing stick forward gives negative value
+    double lateral =  0;
     double target= 0;
     public static double MAX_SERVO = 1, MAX_MOTOR = 1;
     public double error;
     public double power1 = 0;
     public double power;
     public double i=0;
-
-
-
-    public double mpower=0;
-    public LB(AnalogInput A,DcMotor M, CRServoImplEx S, HardwareMap hardwareMap) {
-        PhotonCore.enable();
-        a=A;
-        m=M;
-        m.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        m.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        s=S;
-        ((CRServoImplEx) s).setPwmRange(new PwmControl.PwmRange(500, 2500, 5000));
+    public lbmotorflip(Gamepad gamepad1, HardwareMap hardwareMap) {
         PhotonCore.enable();
         rotationController = new PIDFController(P, I, D, 0);
 
@@ -123,28 +116,114 @@ public class LB {
         // Wait for the game to start (driver presses PLAY)
 
 
+        runtime.reset();
     }
+        // run until the end of the match (driver presses STOP)
+        public void run(Gamepad gamepad) {
+            runtime.reset();
+            rotationController.setPIDF(P, I, D, 0);
+            double max;
+            currentpos = 0;//encoder.getCurrentPosition();
+            currentangle=normalizeDegrees((currentpos/5)*360);
+            axial   = -gamepad.left_stick_y;  // Note: pushing stick forward gives negative value
+            lateral =  gamepad.left_stick_x;
+             target= Math.toDegrees(Math.atan2(lateral,axial));
+            if(axial == 0&&lateral==0)target=0;
+            power=Math.sqrt((axial*axial)+(lateral*lateral));
+            power=Range.clip(power,-1,1);
+            if (((target>=0&&target<=45)||(target<0&&target>=-45))&&gamepad.right_stick_x<0){
+                power= Range.clip(power/-Range.scale(gamepad.right_stick_x,-1,1,-10,10),0,1);
+            } else if ((target>45&&target<=135)&&gamepad.right_stick_x>0){
+                power= Range.clip(power/Range.scale(gamepad.right_stick_x,-1,1,-10,10),0,1);
+            }else if (((target>=135&&target<=180)||(target<-135&&target>=-180))&&gamepad.right_stick_x>0) {
+                power= Range.clip(power/Range.scale(gamepad.right_stick_x,-1,1,-10,10),0,1);
+            }else if ((target>-135&&target<=-45)&&gamepad.right_stick_x<0){
+                power= Range.clip(power/-Range.scale(gamepad.right_stick_x,-1,1,-10,10),0,1);
+            }
 
-        public void run(double t,double p){
-            double currentangle=normalizeDegrees((getPos()/5)*360);
-            error = normalizeDegrees(t - currentangle);
+            if(axial==0 && lateral==0 &&gamepad.right_stick_x<0){
+                if(Math.abs(135-currentangle)<=180){
+                    target= 135;
+                    power=gamepad.right_stick_x;
+                } else if(Math.abs(135-currentangle)>180){
+                    target= -45;
+                    power=(-gamepad.right_stick_x);
+                }
+            }else if(axial==0 && lateral==0&&gamepad.right_stick_x>0){
+                if(Math.abs(135-currentangle)<=180){
+                    target= 135;
+                    power=gamepad.right_stick_x;
+                } else if(Math.abs(135-currentangle)>180){
+                    target= -45;
+                    power=(-gamepad.right_stick_x);
+                }
+            }
+
+            if(target==0&&power==0){
+                target=currentangle;
+            }
+            // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
+            error = normalizeDegrees(target - currentangle);
             if (Double.isNaN(error)) error = 0;
+
+            if(Math.abs(error)>135){//motor flipping test
+                if(error>135){
+                    target=target-180;
+                    power=power*-1;
+                } else if(error<-135){
+                    target=target+180;
+                    power=power*-1;
+                }
+                error = normalizeDegrees(target - currentangle);
+                if (Double.isNaN(error)) error = 0;
+            }
 
             power1 = Range.clip(rotationController.calculate(0, error), -MAX_SERVO, MAX_SERVO);
             if (Double.isNaN(power1)) power1 = 0;
             //servo.setPower(power1 + (Math.abs(error) > 0.02 ? K_STATIC : 0) * Math.signum(power1));
             axonpower=power1 + (Math.abs(error) > 0.02 ? K_STATIC : 0) * Math.signum(power1);
-            runp(axonpower,p);
-    }
-        // run until the end of the match (driver presses STOP)
-        public void runp(double p,double mp) {
-           m.setPower(mp);
-           s.setPower(p);
-        }
-        public double getPos() {
-            double e=a.getVoltage();
-           return e;
-        }
+//            if((gamepad1.right_stick_x<=0||gamepad1.right_stick_x>=0)&&(power==0)){
+//                if (gamepad1.right_stick_x<0){
+//
+//                }
+//            }
+          //  double angle=Math.atan2(axial,lateral);
+//            if (Math.abs(angle-currentangle)>180){
+//                target=angle-180;
+//                power=-1*power;
+//            }else{
+//                target=angle;
+//            }
+//            if(target<0){
+//                target=-1*target;
+//                target=target+180
+//            }
+            // Combine the joystick requests for each axis-motion to determine each wheel's power.
+            // Set up a variable for each drive wheel to save the power level for telemetry.
 
+
+            // This is test code:
+            //
+            // Uncomment the following code to test your motor directions.
+            // Each button should make the corresponding motor run FORWARD.
+            //   1) First get all the motors to take to correct positions on the robot
+            //      by adjusting your Robot Configuration if necessary.
+            //   2) Then make sure they run in the correct direction by modifying the
+            //      the setDirection() calls above.
+            // Once the correct motors move in the correct direction re-comment this code.
+
+            /*
+            leftFrontPower  = gamepad1.x ? 1.0 : 0.0;  // X gamepad
+            leftBackPower   = gamepad1.a ? 1.0 : 0.0;  // A gamepad
+            rightFrontPower = gamepad1.y ? 1.0 : 0.0;  // Y gamepad
+            rightBackPower  = gamepad1.b ? 1.0 : 0.0;  // B gamepad
+            */
+
+            // Send calculated power to wheels
+
+            // Show the elapsed game time and wheel power.
+
+            //runtime.reset();
+        }
     }
 
