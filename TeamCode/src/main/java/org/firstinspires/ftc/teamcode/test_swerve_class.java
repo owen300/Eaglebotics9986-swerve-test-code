@@ -70,7 +70,7 @@ import com.outoftheboxrobotics.photoncore.PhotonCore;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="swerve test idk", group="00")
+@TeleOp(name="1swerve test idk", group="00")
 
 public class test_swerve_class extends LinearOpMode {
     public static double P = 0.45, I = 0.01, D = 0.1;
